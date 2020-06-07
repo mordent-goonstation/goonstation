@@ -11,16 +11,13 @@
 	var/list/modules = list()
 	var/mod_hudicon = "unknown"
 	var/cosmetic_mods = null
-	var/include_common_tools = TRUE
-	var/included_tools = null
+	var/included_tools = /datum/robot/module_tool_creator/recursive/module/common
 	var/included_cosmetic = null
 	var/radio_type = null
 	var/obj/item/device/radio/radio = null
 
 /obj/item/robot_module/New()
 	// add contents
-	if (src.include_common_tools)
-		src.add_contents(/datum/robot/module_tool_creator/recursive/module/common)
 	src.add_contents(src.included_tools)
 	// no need to keep the definition past initializing
 	src.included_tools = null

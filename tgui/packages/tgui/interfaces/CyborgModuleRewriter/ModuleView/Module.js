@@ -6,6 +6,7 @@
  */
 
 import { Button, Section } from '../../../components';
+import { Layout } from '../../../layouts';
 import Tools from './Tools';
 
 const resetOptions = [
@@ -40,7 +41,7 @@ const Module = props => {
   } = props;
 
   return (
-    <>
+    <Layout scrollable>
       <Section title="Preset">
         {
           resetOptions.map(resetOption => {
@@ -67,7 +68,7 @@ const Module = props => {
           tools={tools}
         />
       </Section>
-    </>
+    </Layout>
   );
 };
 

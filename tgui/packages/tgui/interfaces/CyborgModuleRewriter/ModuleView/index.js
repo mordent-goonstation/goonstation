@@ -6,6 +6,7 @@
  */
 
 import { Flex, Section, Tabs, Button } from '../../../components';
+import { Layout } from '../../../layouts';
 import EmptyPlaceholder from '../EmptyPlaceholder';
 import Module from './Module';
 

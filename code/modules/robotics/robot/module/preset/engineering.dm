@@ -1,10 +1,10 @@
-/obj/item/robot_module/engineering
+/obj/item/robot_module/preset/engineering
 	name = "engineering cyborg module"
 	desc = "A module designed to allow for station maintenance and repair work."
 	icon_state = "engineering"
 	mod_hudicon = "engineering"
 	included_cosmetic = /datum/robot_cosmetic/engineering
-	included_tools = /datum/robot/module_tool_creator/recursive/module/engineering
+	included_tools = /datum/robot/module_tool_creator/recursive/preset/engineering
 	radio_type = /obj/item/device/radio/headset/engineer
 
 /datum/robot_cosmetic/engineering

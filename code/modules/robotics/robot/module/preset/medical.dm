@@ -1,10 +1,10 @@
-/obj/item/robot_module/medical
+/obj/item/robot_module/preset/medical
 	name = "medical cyborg module"
 	desc = "Incorporates medical tools intended for use to save and preserve human life."
 	icon_state = "medical"
 	mod_hudicon = "medical"
 	included_cosmetic = /datum/robot_cosmetic/medical
-	included_tools = /datum/robot/module_tool_creator/recursive/module/medical
+	included_tools = /datum/robot/module_tool_creator/recursive/preset/medical
 	radio_type = /obj/item/device/radio/headset/medical
 
 /datum/robot_cosmetic/medical

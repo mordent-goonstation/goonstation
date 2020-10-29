@@ -9,6 +9,8 @@
 	lb = 0
 	var/list/obj/item/robot_module/modules = null
 	var/obj/item/robot_module/selectedModule = null
+	/// contained within circuit board and used to maintain data between construction/deconstruction
+	var/list/records = null
 
 /obj/machinery/computer/robot_module_rewriter/attackby(obj/item/I as obj, mob/user as mob)
 	if (isscrewingtool(I))
@@ -16,6 +18,8 @@
 		if (do_after(user, 20))
 			var/obj/computerframe/computer = new /obj/computerframe(src.loc)
 			var/obj/item/circuitboard/robot_module_rewriter/circuitboard = new /obj/item/circuitboard/robot_module_rewriter(computer)
+			// transfer records over to persist on circuitboard
+			circuitboard.records = src.records
 			computer.circuit = circuitboard
 			computer.anchored = 1
 			if (src.material)
@@ -120,17 +124,17 @@
 						var/moduleResetType
 						switch (moduleId)
 							if ("brobocop")
-								moduleResetType = /obj/item/robot_module/brobocop
+								moduleResetType = /obj/item/robot_module/preset/brobocop
 							if ("chemistry")
-								moduleResetType = /obj/item/robot_module/chemistry
+								moduleResetType = /obj/item/robot_module/preset/chemistry
 							if ("civilian")
-								moduleResetType = /obj/item/robot_module/civilian
+								moduleResetType = /obj/item/robot_module/preset/civilian
 							if ("engineering")
-								moduleResetType = /obj/item/robot_module/engineering
+								moduleResetType = /obj/item/robot_module/preset/engineering
 							if ("medical")
-								moduleResetType = /obj/item/robot_module/medical
+								moduleResetType = /obj/item/robot_module/preset/medical
 							if ("mining")
-								moduleResetType = /obj/item/robot_module/mining
+								moduleResetType = /obj/item/robot_module/preset/mining
 						if (moduleResetType)
 							var/obj/item/robot_module/replacementModule = new moduleResetType(src)
 							var/moduleIndex = src.modules.Find(module)

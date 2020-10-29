@@ -6,6 +6,7 @@
  */
 
 import { useBackend } from '../backend';
+import { Section, Tabs } from '../components';
 import { Window } from '../layouts';
 import ModuleView from './CyborgModuleRewriter/ModuleView';
 import { BlockCn } from './CyborgModuleRewriter/style';
@@ -40,7 +41,13 @@ export const CyborgModuleRewriter = (props, context) => {
       width={670}
       height={640}
       resizable>
-      <Window.Content className={BlockCn} scrollable>
+      <Window.Content className={BlockCn}>
+        <Section fitted>
+          <Tabs>
+            <Tabs.Tab selected>Modules</Tabs.Tab>
+            <Tabs.Tab>Tools</Tabs.Tab>
+          </Tabs>
+        </Section>
         <ModuleView
           modules={modules}
           onEjectModule={handleEjectModule}

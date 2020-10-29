@@ -1,10 +1,10 @@
-/obj/item/robot_module/mining
+/obj/item/robot_module/preset/mining
 	name = "mining cyborg module"
 	desc = "Tools for use in the excavation and transportation of valuable minerals."
 	icon_state = "mining"
 	mod_hudicon = "mining"
 	included_cosmetic = /datum/robot_cosmetic/mining
-	included_tools = /datum/robot/module_tool_creator/recursive/module/mining
+	included_tools = /datum/robot/module_tool_creator/recursive/preset/mining
 	radio_type = /obj/item/device/radio/headset/engineer
 
 /datum/robot_cosmetic/mining

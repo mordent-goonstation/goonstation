@@ -9,6 +9,10 @@
 	w_class = 2.0
 	flags = FPRINT | TABLEPASS | CONDUCT
 	var/list/tools = list()
+	/// list of instances of tools added to the base module
+	var/list/expanded_tools = null
+	/// abstract total space available to have tools added to the base module
+	var/expansion_space = 5
 	var/mod_hudicon = "unknown"
 	var/cosmetic_mods = null
 	var/include_common_tools = TRUE
@@ -21,7 +25,7 @@
 	..()
 	// add contents
 	if (src.include_common_tools)
-		src.add_contents(/datum/robot/module_tool_creator/recursive/module/common)
+		src.add_contents(/datum/robot/module_tool_creator/recursive/preset/common)
 	src.add_contents(src.included_tools)
 	// no need to keep the definition past initializing
 	src.included_tools = null

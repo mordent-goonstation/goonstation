@@ -2139,37 +2139,37 @@
 			if("Brobocop")
 				src.freemodule = 0
 				boutput(src, "<span class='notice'>You chose the Brobocop module. It comes with a free Security HUD Upgrade.</span>")
-				src.set_module(new /obj/item/robot_module/brobocop(src))
+				src.set_module(new /obj/item/robot_module/preset/brobocop(src))
 				src.upgrades += new /obj/item/roboupgrade/sechudgoggles(src)
 			if("Chemistry")
 				src.freemodule = 0
 				boutput(src, "<span class='notice'>You chose the Chemistry module. It comes with a free Spectroscopic Scanner Upgrade.</span>")
-				src.set_module(new /obj/item/robot_module/chemistry(src))
+				src.set_module(new /obj/item/robot_module/preset/chemistry(src))
 				src.upgrades += new /obj/item/roboupgrade/spectro(src)
 			if("Civilian")
 				src.freemodule = 0
 				boutput(src, "<span class='notice'>You chose the Civilian module. It comes with a free Efficiency Upgrade.</span>")
-				src.set_module(new /obj/item/robot_module/civilian(src))
+				src.set_module(new /obj/item/robot_module/preset/civilian(src))
 				src.upgrades += new /obj/item/roboupgrade/efficiency(src)
 			if("Engineering")
 				src.freemodule = 0
 				boutput(src, "<span class='notice'>You chose the Engineering module. It comes with a free Meson Vision Upgrade.</span>")
-				src.set_module(new /obj/item/robot_module/engineering(src))
+				src.set_module(new /obj/item/robot_module/preset/engineering(src))
 				src.upgrades += new /obj/item/roboupgrade/opticmeson(src)
 			if("Medical")
 				src.freemodule = 0
 				boutput(src, "<span class='notice'>You chose the Medical module. It comes with a free ProDoc Healthgoggles Upgrade.</span>")
-				src.set_module(new /obj/item/robot_module/medical(src))
+				src.set_module(new /obj/item/robot_module/preset/medical(src))
 				src.upgrades += new /obj/item/roboupgrade/healthgoggles(src)
 			if("Mining")
 				src.freemodule = 0
 				boutput(src, "<span class='notice'>You chose the Mining module. It comes with a free Propulsion Upgrade.</span>")
-				src.set_module(new /obj/item/robot_module/mining(src))
+				src.set_module(new /obj/item/robot_module/preset/mining(src))
 				src.upgrades += new /obj/item/roboupgrade/jetpack(src)
 			if ("Construction Worker")
 				src.freemodule = 0
 				boutput(src, "<span class='notice'>You chose the Construction Worker module. It comes with a free Construction Visualizer Upgrade.</span>")
-				src.set_module(new /obj/item/robot_module/construction_worker(src))
+				src.set_module(new /obj/item/robot_module/preset/construction_worker(src))
 				src.upgrades += new /obj/item/roboupgrade/visualizer(src)
 
 		var/datum/robot_cosmetic/C = null

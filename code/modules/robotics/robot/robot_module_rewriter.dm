@@ -45,8 +45,6 @@
 /obj/machinery/computer/robot_module_rewriter/attack_ai(mob/user as mob)
 	return src.attack_hand(user)
 
-// INTERFACE
-
 /obj/machinery/computer/robot_module_rewriter/ui_interact(mob/user, datum/tgui/ui)
 	ui = tgui_process.try_update_ui(user, src, ui)
 	if (!ui)
@@ -54,8 +52,6 @@
 		ui.open()
 
 /obj/machinery/computer/robot_module_rewriter/ui_data(mob/user)
-	var/list/modulesData = list()
-
 	var/list/availableModulesData = list()
 	for (var/obj/item/robot_module/module in src.modules)
 		var/list/availableModuleData = list()
@@ -63,8 +59,6 @@
 		availableModuleData["ref"] = "\ref[module]"
 		// wrapping in a list to append actual list rather than contents
 		availableModulesData += list(availableModuleData)
-	modulesData["available"] = availableModulesData
-
 	var/list/selectedModuleData = null
 	if (src.selectedModule)
 		selectedModuleData = list()
@@ -77,21 +71,17 @@
 			// wrapping in a list to append actual list rather than contents
 			selectedModuleToolsData += list(toolData)
 		selectedModuleData["tools"] = selectedModuleToolsData
-	modulesData["selected"] = selectedModuleData
-
-	// "modules" is the only key in our return list, so could be flattened,
-	// but there is intent to add more features in the near future
-	. = list("modules" = modulesData)
+	. = list(
+		"availableModules" = availableModulesData,
+		"selectedModule" = selectedModuleData,
+	)
 
 /obj/machinery/computer/robot_module_rewriter/ui_act(action, list/params, datum/tgui/ui)
 	. = ..()
 	if (.)
 		return
-
 	var/mob/user = ui.user
-
 	switch (action)
-
 		if ("module-eject")
 			var/moduleRef = params["moduleRef"]
 			if (moduleRef)
@@ -104,7 +94,6 @@
 					if (module.loc == src)
 						user.put_in_hand_or_eject(module)
 			. = TRUE
-
 		if ("module-reset")
 			var/moduleId = params["moduleId"]
 			var/moduleRef = params["moduleRef"]
@@ -138,7 +127,6 @@
 								src.selectedModule = replacementModule
 								qdel(module)
 			. = TRUE
-
 		if ("module-select")
 			var/moduleRef = params["moduleRef"]
 			if (moduleRef)
@@ -149,7 +137,6 @@
 			else
 				src.selectedModule = null
 			. = TRUE
-
 		if ("tool-move")
 			var/dir = params["dir"]
 			var/moduleRef = params["moduleRef"]
@@ -172,7 +159,6 @@
 									if (toolIndex >= 2)
 										module.tools.Swap(toolIndex, toolIndex - 1)
 			. = TRUE
-
 		if ("tool-remove")
 			var/moduleRef = params["moduleRef"]
 			var/toolRef = params["toolRef"]

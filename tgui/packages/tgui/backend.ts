@@ -248,6 +248,8 @@ export const sendAct = (action: string, payload: object = {}) => {
   });
 };
 
+export type Act = typeof sendAct;
+
 type BackendState<TData> = {
   config: {
     title: string,

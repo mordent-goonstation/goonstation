@@ -5,58 +5,71 @@
  * @license ISC
  */
 
+import { useBackend } from '../../../backend';
 import { Button, Flex, Section, Tabs } from '../../../components';
 import { EmptyPlaceholder } from '../EmptyPlaceholder';
+import { ejectModuleAct, moveToolAct, removeToolAct, resetModuleAct, selectModuleAct } from '../actions';
+import { Direction, ModuleType } from '../constants';
+import { CyborgModuleRewriterData, ModuleRef, ToolRef } from '../types';
 import { Module } from './Module';
 
 // width hard-coded to allow display of widest current module name
 // without resizing when ejected/reset
 const ModuleListWidth = 18;
 
-export const ModuleView = props => {
+export const ModuleView = (props, context) => {
+  const { act, data } = useBackend<CyborgModuleRewriterData>(context);
   const {
-    modules: {
-      available = [],
-      selected,
-    } = {},
-    onEjectModule,
-    onMoveToolDown,
-    onMoveToolUp,
-    onRemoveTool,
-    onResetModule,
-    onSelectModule,
-  } = props;
+    availableModules,
+    selectedModule,
+  } = data;
   const {
     ref: selectedModuleRef,
     tools = [],
-  } = selected || {};
+  } = selectedModule || {};
 
-  const handleMoveToolDown = toolRef => onMoveToolDown({
-    moduleRef: selectedModuleRef,
-    toolRef,
-  });
-  const handleMoveToolUp = toolRef => onMoveToolUp({
-    moduleRef: selectedModuleRef,
-    toolRef,
-  });
-  const handleRemoveTool = toolRef => onRemoveTool({
-    moduleRef: selectedModuleRef,
-    toolRef,
-  });
-  const handleResetModule = moduleId => onResetModule({
-    moduleId,
-    moduleRef: selectedModuleRef,
-  });
+  const handleEjectModule = (moduleRef: ModuleRef) => (
+    ejectModuleAct(act, { moduleRef })
+  );
+  const handleMoveToolDown = (toolRef: ToolRef) => (
+    moveToolAct(act, {
+      dir: Direction.Down,
+      moduleRef: selectedModuleRef,
+      toolRef,
+    })
+  );
+  const handleMoveToolUp = (toolRef: ToolRef) => (
+    moveToolAct(act, {
+      dir: Direction.Up,
+      moduleRef: selectedModuleRef,
+      toolRef,
+    })
+  );
+  const handleRemoveTool = (toolRef: ToolRef) => (
+    removeToolAct(act, {
+      moduleRef: selectedModuleRef,
+      toolRef,
+    })
+  );
+  const handleResetModule = (moduleId: ModuleType) => (
+    resetModuleAct(act, {
+      moduleId,
+      moduleRef: selectedModuleRef,
+    })
+  );
+  const handleSelectModule = (moduleRef: ModuleRef) => (
+    selectModuleAct(act, { moduleRef })
+  );
 
   return (
-    available.length > 0
+    availableModules.length > 0
       ? (
         <Flex>
           <Flex.Item width={ModuleListWidth} mr={1}>
             <Section title="Modules" fitted>
               <Tabs vertical>
                 {
-                  available.map(module => {
+                  availableModules.map(module => {
                     const {
                       ref: moduleRef,
                       name,
@@ -65,14 +78,14 @@ export const ModuleView = props => {
                       <Button
                         icon="eject"
                         color="transparent"
-                        onClick={() => onEjectModule(moduleRef)}
+                        onClick={() => handleEjectModule(moduleRef)}
                         title={`Eject ${name}`}
                       />
                     );
                     return (
                       <Tabs.Tab
                         key={moduleRef}
-                        onClick={() => onSelectModule(moduleRef)}
+                        onClick={() => handleSelectModule(moduleRef)}
                         rightSlot={ejectButton}
                         selected={moduleRef === selectedModuleRef}
                       >

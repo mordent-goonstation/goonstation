@@ -6,31 +6,19 @@
  */
 
 import { Button, Section } from '../../../components';
+import { ModuleType, moduleDefinitions } from '../constants';
+import { ToolData } from '../types';
 import { Tools } from './Tools';
 
-const resetOptions = [
-  {
-    id: 'brobocop',
-    name: 'Brobocop',
-  }, {
-    id: 'chemistry',
-    name: 'Chemistry',
-  }, {
-    id: 'civilian',
-    name: 'Civilian',
-  }, {
-    id: 'engineering',
-    name: 'Engineering',
-  }, {
-    id: 'medical',
-    name: 'Medical',
-  }, {
-    id: 'mining',
-    name: 'Mining',
-  },
-];
+interface ModuleProps {
+  onMoveToolDown,
+  onMoveToolUp,
+  onRemoveTool,
+  onResetModule: (moduleId: ModuleType) => void,
+  tools: ToolData[],
+}
 
-export const Module = props => {
+export const Module = (props: ModuleProps) => {
   const {
     onMoveToolDown,
     onMoveToolUp,
@@ -43,11 +31,11 @@ export const Module = props => {
     <>
       <Section title="Preset">
         {
-          resetOptions.map(resetOption => {
+          moduleDefinitions.map(moduleDefinition => {
             const {
               id,
               name,
-            } = resetOption;
+            } = moduleDefinition;
             return (
               <Button
                 key={id}

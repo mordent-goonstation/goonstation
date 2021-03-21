@@ -5,10 +5,16 @@
  * @license ISC
  */
 
+import { InfernoNode } from 'inferno';
 import { classes, pureComponentHooks } from 'common/react';
-import * as styles from './style';
+import * as styles from './styles';
 
-export const EmptyPlaceholder = props => {
+interface EmptyPlaceholderProps {
+  children: InfernoNode,
+  className?: string,
+}
+
+export const EmptyPlaceholder = (props: EmptyPlaceholderProps) => {
   const {
     children,
     className,

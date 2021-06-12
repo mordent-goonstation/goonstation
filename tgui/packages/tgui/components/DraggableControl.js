@@ -224,19 +224,19 @@ export class DraggableControl extends Component {
           }
           let value;
           if (unclamped) {
-            value = e.target.value;
+            value = parseFloat(e.target.value);
           }
           else {
             value = clamp(
               parseFloat(e.target.value),
               minValue,
               maxValue);
-            if (Number.isNaN(value)) {
-              this.setState({
-                editing: false,
-              });
-              return;
-            }
+          }
+          if (Number.isNaN(value)) {
+            this.setState({
+              editing: false,
+            });
+            return;
           }
           this.setState({
             editing: false,
@@ -254,19 +254,19 @@ export class DraggableControl extends Component {
           if (e.keyCode === 13) {
             let value;
             if (unclamped) {
-              value = e.target.value;
+              value = parseFloat(e.target.value);
             }
             else {
               value = clamp(
                 parseFloat(e.target.value),
                 minValue,
                 maxValue);
-              if (Number.isNaN(value)) {
-                this.setState({
-                  editing: false,
-                });
-                return;
-              }
+            }
+            if (Number.isNaN(value)) {
+              this.setState({
+                editing: false,
+              });
+              return;
             }
             this.setState({
               editing: false,

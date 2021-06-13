@@ -29,7 +29,7 @@ export const Stack = (props: StackProps) => {
   );
 };
 
-const StackItem = props => {
+const StackItem = (props: FlexProps) => {
   const { className, ...rest } = props;
   return (
     <Flex.Item

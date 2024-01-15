@@ -388,7 +388,7 @@
 	if (..(parent))
 		return 1
 	if (!isdead(src))
-		use_power()
+		src.use_power()
 
 /mob/living/silicon/robot/Life(datum/controller/process/mobs/parent)
 	if (..(parent))
@@ -398,16 +398,16 @@
 
 	if (!isdead(src)) //Alive.
 		if (src.health < 0)
-			death()
+			src.death()
 
-	process_killswitch()
-	process_locks()
-	update_canmove()
+	src.process_killswitch()
+	src.process_locks()
+	src.update_canmove()
 
 	for (var/obj/item/parts/robot_parts/part in src.contents)
 		part.on_life(src)
 
-	if (metalman_skin && prob(1))
+	if (src.metalman_skin && prob(1))
 		var/msg = pick("can't see...","feels bad...","leave me...", "you're cold...", "unwelcome...")
 		src.show_text(voidSpeak(msg))
 		src.emagged = 1

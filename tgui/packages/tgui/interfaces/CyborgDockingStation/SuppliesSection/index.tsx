@@ -9,12 +9,13 @@
 import { useBackend } from '../../../backend';
 import { Button, LabeledList, Section } from '../../../components';
 import { AvailableCellsSection } from './AvailableCellsSection';
-import type { CyborgDockingStationData } from '../type';
+import { AvailableDisksSection } from './AvailableDisksSection';
 import { StandardAvailableSection } from './StandardAvailableSection';
+import type { CyborgDockingStationData } from '../type';
 
 export const SuppliesSection = (_props: unknown, context) => {
   const { act, data } = useBackend<CyborgDockingStationData>(context);
-  const { allow_self_service, cabling, cells, clothes, fuel, modules, upgrades, viewer_is_robot } = data;
+  const { allow_self_service, cabling, cells, clothes, disks, fuel, modules, upgrades, viewer_is_robot } = data;
   const handleToggleSelfService = () => act('self-service');
   const handleInstallModule = (moduleRef: string) => act('module-install', { moduleRef });
   const handleEjectModule = (moduleRef: string) => act('module-eject', { moduleRef });
@@ -24,6 +25,8 @@ export const SuppliesSection = (_props: unknown, context) => {
   const handleEjectUpgrade = (upgradeRef: string) => act('upgrade-eject', { upgradeRef });
   const handleInstallCell = (cellRef: string) => act('cell-install', { cellRef });
   const handleEjectCell = (cellRef: string) => act('cell-eject', { cellRef });
+  const handleInstallDisk = (diskRef: string) => act('disk-install', { diskRef });
+  const handleEjectDisk = (diskRef: string) => act('disk-eject', { diskRef });
   return (
     <Section title="Supplies">
       <LabeledList>
@@ -52,6 +55,7 @@ export const SuppliesSection = (_props: unknown, context) => {
         title="Upgrades"
       />
       <AvailableCellsSection items={cells} onInstall={handleInstallCell} onEject={handleEjectCell} />
+      <AvailableDisksSection items={disks} onInstall={handleInstallDisk} onEject={handleEjectDisk} />
       <StandardAvailableSection
         items={clothes}
         onInstall={handleInstallClothing}

@@ -23,16 +23,16 @@ export const StandardAvailableSection = <T extends ItemData>(props: StandardAvai
     <Section title={title}>
       {items.length > 0 ? (
         items.map((item) => (
-          <div key={item.ref}>
+          <div key={item.item_ref}>
             {item.name}
             <DockingAllowedButton
-              onClick={() => onInstall(item.ref)}
+              onClick={() => onInstall(item.item_ref)}
               icon="plus-circle"
               color="transparent"
               tooltip="Add to occupant"
             />
             <DockingAllowedButton
-              onClick={() => onEject(item.ref)}
+              onClick={() => onEject(item.item_ref)}
               icon="eject"
               color="transparent"
               tooltip="Eject from station"

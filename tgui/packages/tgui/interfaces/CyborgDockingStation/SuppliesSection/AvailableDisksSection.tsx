@@ -1,48 +1,44 @@
 /**
  * @file
- * @copyright 2022
- * @author glowbold (https://github.com/pgmzeta)
+ * @copyright 2024
  * @author Mordent (https://github.com/mordent-goonstation)
  * @license ISC
  */
 
 import { Box, LabeledList, Section } from '../../../components';
-import { CellChargeBar } from '../CellChargeBar';
+import { DiskDisplay } from '../DiskDisplay';
 import { DockingAllowedButton } from '../DockingAllowedButton';
-import type { PowerCellData } from '../type';
+import type { DiskData } from '../type';
 
-interface AvailableCellsSectionProps {
-  items: PowerCellData[];
+interface AvailableDisksSectionProps {
+  items: DiskData[];
   onEject: (ref: string) => void;
   onInstall: (ref: string) => void;
 }
 
-export const AvailableCellsSection = (props: AvailableCellsSectionProps) => {
+export const AvailableDisksSection = (props: AvailableDisksSectionProps) => {
   const { items, onEject, onInstall } = props;
   return (
-    <Section title="Power Cells">
+    <Section title="Disks">
       {items?.length > 0 ? (
         <LabeledList>
-          {items.map((item) => {
+          {items.map(({ name, item_ref, ...rest }) => {
             return (
-              <div key={item.item_ref}>
+              <div key={item_ref}>
                 <LabeledList.Item
-                  label={item.name}
+                  verticalAlign="middle"
+                  label={name}
                   buttons={
                     <>
+                      <DockingAllowedButton onClick={() => onInstall(item_ref)} icon="plus" tooltip="Add to occupant" />
                       <DockingAllowedButton
-                        onClick={() => onInstall(item.item_ref)}
-                        icon="plus"
-                        tooltip="Add to occupant"
-                      />
-                      <DockingAllowedButton
-                        onClick={() => onEject(item.item_ref)}
+                        onClick={() => onEject(item_ref)}
                         icon="eject"
                         tooltip="Eject from station"
                       />
                     </>
                   }>
-                  <CellChargeBar cell={item} />
+                  <DiskDisplay {...rest} />
                 </LabeledList.Item>
               </div>
             );

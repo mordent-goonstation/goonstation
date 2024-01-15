@@ -285,6 +285,27 @@
 		fields = null
 		. = ..()
 
+/datum/computer/file/robotics_analysis
+	extension = "RAD"
+	size = 8
+	/// ID used to ensure files are only processed once
+	var/unique_id
+	var/data = 0
+	var/maximum_data = 256
+
+	New()
+		..()
+		src.unique_id = "[src.generate_id_fragment()]-[src.generate_id_fragment()]"
+		src.name = "[src.unique_id]"
+
+	proc/generate_id_fragment()
+		return add_zero(num2hex(rand(1, 0xffffff), 0), 6)
+
+	proc/add_data(amount)
+		src.data = clamp(src.data + amount, 0, src.maximum_data)
+
+	asText()
+		return "[src.unique_id]: [src.data] / [src.maximum_data]|n"
 
 /datum/computer/folder/link
 	name = "symlink"

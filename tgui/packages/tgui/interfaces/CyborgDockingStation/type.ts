@@ -27,6 +27,7 @@ export interface CyborgDockingStationData {
   modules: ModuleData[];
   upgrades: UpgradeData[];
   clothes: ClothingData[];
+  disks: DiskData[];
 }
 
 interface OccupantDataBase {
@@ -43,6 +44,7 @@ export interface OccupantDataRobot extends OccupantDataBase {
   upgrades_max: number;
   clothing: ClothingData[];
   cosmetics: RobotCosmeticsData;
+  disk: DiskData | null;
   user: 'brain' | 'ai' | 'unknown';
 }
 
@@ -89,12 +91,26 @@ export const isPresentPartsData = (partData: PartData): partData is PresentPartD
 
 export interface ItemData {
   name: string;
-  ref: string;
+  item_ref: string;
 }
 
 export interface PowerCellData extends ItemData {
   current: number;
   max: number;
+}
+
+export interface RoboticAnalysisDataFileHolderData {
+  space_used: number;
+  space_total: number;
+  rad_files: RoboticAnalysisDataFileData[];
+}
+
+export interface DiskData extends ItemData, RoboticAnalysisDataFileHolderData {}
+
+export interface RoboticAnalysisDataFileData extends ItemData {
+  data: number;
+  maximum_data: number;
+  space_used: number;
 }
 
 export interface ModuleData extends ItemData {}

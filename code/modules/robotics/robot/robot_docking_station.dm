@@ -21,6 +21,7 @@ TYPEINFO(/obj/machinery/recharge_station)
 	var/list/upgrades = list()
 	var/list/modules = list()
 	var/list/clothes = list()
+	var/list/obj/item/disk/data/disks = null
 	var/allow_self_service = TRUE
 	var/conversion_chamber = FALSE
 	var/mob/occupant = null
@@ -31,6 +32,7 @@ TYPEINFO(/obj/machinery/recharge_station)
 	src.flags |= NOSPLASH
 	src.create_reagents(500)
 	src.reagents.add_reagent("fuel", 250)
+	src.disks = list()
 	src.build_icon()
 	START_TRACKING
 
@@ -116,6 +118,13 @@ TYPEINFO(/obj/machinery/recharge_station)
 		W.set_loc(src)
 		boutput(user, "You insert [W].")
 		src.cells.Add(W)
+
+	else if (istype(W, /obj/item/disk/data))
+		if (user.contents.Find(W))
+			user.drop_item()
+		W.set_loc(src)
+		boutput(user, "You insert [W].")
+		src.disks.Add(W)
 
 	else if (istype(W, /obj/item/cable_coil))
 		var/obj/item/cable_coil/C = W
@@ -377,11 +386,44 @@ TYPEINFO(/obj/machinery/recharge_station)
 		return
 	..()
 
+/obj/machinery/recharge_station/proc/remove_occupant_disk()
+	var/mob/living/silicon/robot/robot = src.occupant
+	if (!isrobot(robot))
+		return
+	var/obj/item/disk/data/disk_to_remove = robot.part_chest?.disk
+	if (!disk_to_remove)
+		return
+	src.disks += disk_to_remove
+	disk_to_remove.set_loc(src)
+	robot.part_chest.disk = null
+	return disk_to_remove
+
 /obj/machinery/recharge_station/ui_interact(mob/user, datum/tgui/ui)
 	ui = tgui_process.try_update_ui(user, src, ui)
 	if(!ui)
 		ui = new(user, src, "CyborgDockingStation")
 		ui.open()
+
+/obj/machinery/recharge_station/proc/get_disk_ui_data(obj/item/disk/data/disk)
+	if (!disk)
+		return
+	var/list/serialized_rad_files = list()
+	for (var/datum/computer/file/robotics_analysis/rad_file in disk.root.contents)
+		var/list/serialized_rad_file = list(
+			"name" = rad_file.name,
+			"item_ref" = "\ref[rad_file]",
+			"space_used" = rad_file.size,
+			"data" = rad_file.data,
+			"maximum_data" = rad_file.maximum_data
+		)
+		serialized_rad_files += list(serialized_rad_file)
+	. = list(
+		"name" = disk.name,
+		"item_ref" = "\ref[disk]",
+		"space_used" = disk.file_used,
+		"space_total" = disk.file_amount,
+		"rad_files" = serialized_rad_files
+	)
 
 /obj/machinery/recharge_station/ui_data(mob/user)
 	. = list()
@@ -498,10 +540,12 @@ TYPEINFO(/obj/machinery/recharge_station)
 			for (var/obj/item/roboupgrade/U in R.upgrades)
 				var/list/this_upgrade = list()
 				this_upgrade["name"] = U.name
-				this_upgrade["ref"] = "\ref[U]"
+				this_upgrade["item_ref"] = "\ref[U]"
 				occupant_upgrades += list(this_upgrade)
 		occupant_data["upgrades"] = occupant_upgrades
 		occupant_data["upgrades_max"] = R.max_upgrades
+
+		occupant_data["disk"] = src.get_disk_ui_data(R.part_chest?.disk)
 
 		var/list/occupant_clothing = list()
 		if (length(R.clothes))
@@ -509,7 +553,7 @@ TYPEINFO(/obj/machinery/recharge_station)
 				var/list/this_cloth = list()
 				var/obj/O = R.clothes[A]
 				this_cloth["name"] = O.name
-				this_cloth["ref"] = "\ref[O]"
+				this_cloth["item_ref"] = "\ref[O]"
 				occupant_clothing += list(this_cloth)
 		occupant_data["clothing"] = occupant_clothing
 
@@ -551,7 +595,7 @@ TYPEINFO(/obj/machinery/recharge_station)
 		for (var/obj/item/cell/C in src.cells)
 			var/list/this_cell = list()
 			this_cell["name"] = C.name
-			this_cell["ref"] = "\ref[C]"
+			this_cell["item_ref"] = "\ref[C]"
 			this_cell["current"] = C.charge
 			this_cell["max"] = C.maxcharge
 			power_cells_available += list(this_cell)
@@ -562,7 +606,7 @@ TYPEINFO(/obj/machinery/recharge_station)
 		for (var/obj/item/robot_module/M in src.modules)
 			var/list/this_module = list()
 			this_module["name"] = M.name
-			this_module["ref"] = "\ref[M]"
+			this_module["item_ref"] = "\ref[M]"
 			modules_available += list(this_module)
 	.["modules"] = modules_available
 
@@ -571,7 +615,7 @@ TYPEINFO(/obj/machinery/recharge_station)
 		for (var/obj/item/roboupgrade/U in src.upgrades)
 			var/list/this_upgrade = list()
 			this_upgrade["name"] = U.name
-			this_upgrade["ref"] = "\ref[U]"
+			this_upgrade["item_ref"] = "\ref[U]"
 			upgrades_available += list(this_upgrade)
 	.["upgrades"] = upgrades_available
 
@@ -580,9 +624,15 @@ TYPEINFO(/obj/machinery/recharge_station)
 		for (var/obj/item/clothing/C in src.clothes)
 			var/list/this_clothing = list()
 			this_clothing["name"] = C.name
-			this_clothing["ref"] = "\ref[C]"
+			this_clothing["item_ref"] = "\ref[C]"
 			clothing_available += list(this_clothing)
 	.["clothes"] = clothing_available
+
+	var/list/disks_available = list()
+	if (length(src.disks))
+		for (var/obj/item/disk/data/D in src.disks)
+			disks_available += list(src.get_disk_ui_data(D))
+	.["disks"] = disks_available
 
 /obj/machinery/recharge_station/ui_act(action, list/params, datum/tgui/ui)
 	. = ..()
@@ -1025,6 +1075,46 @@ TYPEINFO(/obj/machinery/recharge_station)
 					src.cells.Remove(cell_to_eject)
 					if (cell_to_eject.loc == src)
 						user.put_in_hand_or_eject(cell_to_eject)
+			. = TRUE
+
+		if ("disk-install")
+			var/diskRef = params["diskRef"]
+			if (!diskRef)
+				return
+			var/obj/item/disk/data/disk_to_install = locate(diskRef) in src.disks
+			if (!disk_to_install)
+				return
+			var/mob/living/silicon/robot/robot = src.occupant
+			if (!isrobot(robot))
+				return
+			var/obj/item/parts/robot_parts/chest/target_chest = robot.part_chest
+			if (!target_chest)
+				return
+			// remove current disk (if any)
+			src.remove_occupant_disk()
+			// install new disk
+			disk_to_install.set_loc(target_chest)
+			target_chest.disk = disk_to_install
+			src.disks.Remove(disk_to_install)
+			robot.hud.update_charge() // TODO (robo-research): update disk HUD
+			. = TRUE
+		if ("disk-remove")
+			var/obj/item/disk/data/removed_disk = src.remove_occupant_disk()
+			if (!removed_disk)
+				return
+			var/mob/living/silicon/robot/robot = src.occupant
+			robot.hud.update_charge() // TODO (robo-research): update disk HUD
+			. = TRUE
+		if ("disk-eject")
+			var/diskRef = params["diskRef"]
+			if (!diskRef)
+				return
+			var/obj/item/disk/data/disk_to_eject = locate(diskRef) in src.disks
+			if (!disk_to_eject)
+				return
+			if (disk_to_eject.loc == src)
+				src.disks.Remove(disk_to_eject)
+				user.put_in_hand_or_eject(disk_to_eject)
 			. = TRUE
 
 #undef MAGIC_BULLSHIT_FREE_POWER_MULTIPLIER

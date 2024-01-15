@@ -8,12 +8,13 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/chest)
 	// These vars track the wiring/cell that the chest needs before you can stuff it on a frame
 	var/wires = 0
 	var/obj/item/cell/cell = null
+	var/obj/item/disk/data/disk = null
 
 	examine()
 		. = ..()
 
 		if (src.cell)
-			. += SPAN_NOTICE("This chest unit has a [src.cell] installed. Use a wrench if you want to remove it.")
+			. += SPAN_NOTICE("This chest unit has \a [src.cell] installed. Use a wrench if you want to remove it.")
 		else
 			. += SPAN_ALERT("This chest unit has no power cell.")
 
@@ -21,6 +22,8 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/chest)
 			. += SPAN_NOTICE("This chest unit has had wiring installed.")
 		else
 			. += SPAN_ALERT("This chest unit has not yet been wired up.")
+		if (src.disk)
+			. += SPAN_NOTICE("This chest unit has \a [src.disk] preloaded in its disk slot. Use a prying tool if you want to remove it.")
 
 	attackby(obj/item/W, mob/user)
 		if(istype(W, /obj/item/cell))
@@ -47,6 +50,19 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/chest)
 					boutput(user, SPAN_NOTICE("You insert some wire."))
 					playsound(src, 'sound/impact_sounds/Generic_Stab_1.ogg', 40, TRUE)
 
+		else if (istype(W, /obj/item/disk/data))
+			if (src.disk)
+				boutput(user, SPAN_ALERT("There is already a disk inserted."))
+				return
+			else if (W.cant_drop)
+				boutput(user, SPAN_ALERT("You cannot put [W] in [src]."))
+				return
+			user.drop_item()
+			W.set_loc(src)
+			src.disk = W
+			boutput(user, SPAN_NOTICE("You insert [W]."))
+			playsound(src, 'sound/impact_sounds/Generic_Stab_1.ogg', 40, TRUE) // TODO: sound
+
 		else if (iswrenchingtool(W))
 			if(!src.cell)
 				boutput(user, SPAN_ALERT("There's no cell in there to remove."))
@@ -70,6 +86,14 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/chest)
 			C.amount = src.wires
 			src.wires = 0
 
+		else if (ispryingtool(W))
+			if (!src.disk)
+				boutput(user, SPAN_ALERT("There is no disk inserted to remove."))
+				return
+			playsound(src, 'sound/items/Wirecutter.ogg', 40, TRUE) // TODO: sound
+			boutput(user, SPAN_NOTICE("You pry out the disk from inside of the drive in [src]."))
+			src.disk.set_loc(get_turf(src))
+			src.disk = null
 		else ..()
 
 	Exited(Obj, newloc)

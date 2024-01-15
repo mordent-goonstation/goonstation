@@ -8,12 +8,13 @@
 
 import { Box, LabeledList } from '../../../../components';
 import { DockingAllowedButton } from '../../DockingAllowedButton';
-import { OccupantCellDisplay } from '../OccupantCellDisplay';
+import { OccupantCellDisplay } from './OccupantCellDisplay';
 import { DamageReportSection } from './DamageReportSection';
 import { UpgradeReportSection } from './UpgradeReportSection';
 import { DecorationReportSection } from './DecorationReportSection';
 import { ClothingReportSection } from './ClothingReportSection';
 import type { OccupantDataRobot } from '../../type';
+import { DiskDisplay } from '../../DiskDisplay';
 
 interface RobotStatusViewProps {
   act: (action: string, payload?: object) => void;
@@ -24,8 +25,9 @@ interface RobotStatusViewProps {
 
 export const RobotStatusView = (props: RobotStatusViewProps) => {
   const { cabling, fuel, occupant, act } = props;
-  const { cell, moduleName, upgrades, upgrades_max, parts } = occupant;
+  const { cell, disk, moduleName, upgrades, upgrades_max, parts } = occupant;
   const handleRemoveCell = () => act('cell-remove');
+  const handleRemoveDisk = () => act('disk-remove');
   const handleRemoveModule = () => act('module-remove');
   const handleRemoveUpgrade = (upgradeRef: string) => act('upgrade-remove', { upgradeRef });
   const handleRepairStructure = () => act('repair-fuel');
@@ -44,10 +46,30 @@ export const RobotStatusView = (props: RobotStatusViewProps) => {
     'remove': () => act('occupant-paint-remove'),
   };
   const hasModule = !!moduleName;
+  const hasDisk = !!disk;
   return (
     <>
       <LabeledList>
         <OccupantCellDisplay cell={cell} onRemoveCell={handleRemoveCell} />
+        <LabeledList.Item
+          label="Disk"
+          buttons={
+            <DockingAllowedButton
+              onClick={handleRemoveDisk}
+              icon="minus"
+              tooltip="Remove the occupant's disk"
+              disabled={!hasDisk}
+            />
+          }
+          verticalAlign="middle">
+          {hasDisk ? (
+            <DiskDisplay space_used={disk.space_used} space_total={disk.space_total} rad_files={disk.rad_files} />
+          ) : (
+            <Box as="span" color="red">
+              No Disk Inserted
+            </Box>
+          )}
+        </LabeledList.Item>
         <LabeledList.Item
           label="Module"
           buttons={

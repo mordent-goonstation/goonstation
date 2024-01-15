@@ -24,7 +24,7 @@ export const UpgradeReportSection = (props: UpgradeReportSectionProps) => {
       <div>
         {upgrades.map((upgrade) => {
           return (
-            <Stack key={upgrade.ref}>
+            <Stack key={upgrade.item_ref}>
               <Stack.Item>{upgrade.name}</Stack.Item>
               <Stack.Item>
                 <DockingAllowedButton
@@ -32,7 +32,7 @@ export const UpgradeReportSection = (props: UpgradeReportSectionProps) => {
                   icon="minus-circle"
                   color="transparent"
                   tooltip={`Remove ${upgrade.name}`}
-                  onClick={() => onRemoveUpgrade(upgrade.ref)}
+                  onClick={() => onRemoveUpgrade(upgrade.item_ref)}
                 />
               </Stack.Item>
             </Stack>

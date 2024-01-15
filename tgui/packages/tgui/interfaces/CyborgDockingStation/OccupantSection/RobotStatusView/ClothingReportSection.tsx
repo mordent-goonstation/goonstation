@@ -22,10 +22,10 @@ export const ClothingReportSection = (props: ClothingReportSectionProps) => {
       {clothes.length > 0 ? (
         clothes.map((cloth) => {
           return (
-            <Box key={cloth.ref}>
+            <Box key={cloth.item_ref}>
               {cloth.name}
               <DockingAllowedButton
-                onClick={() => onRemoveClothing(cloth.ref)}
+                onClick={() => onRemoveClothing(cloth.item_ref)}
                 icon="minus-circle"
                 color="transparent"
                 tooltip="Remove from occupant"

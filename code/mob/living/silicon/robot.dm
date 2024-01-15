@@ -1214,6 +1214,19 @@
 				src.set_module(W)
 				boutput(user, "You insert [W].")
 
+		else if (istype(W, /obj/item/disk/data) && src.opened) // inserting disk
+			if (src.wiresexposed)
+				boutput(user, SPAN_ALERT("You need to get the wires out of the way first."))
+			else if (!src.part_chest)
+				boutput(user, SPAN_ALERT("[src] does not have a disk slot to insert [W] into!"))
+			else if (src.part_chest.disk)
+				boutput(user, SPAN_ALERT("[src] already has a disk inserted!"))
+			else
+				user.drop_item(W)
+				W.set_loc(src.part_chest)
+				src.part_chest.disk = W
+				boutput(user, "You insert [W].")
+
 		else if	(isscrewingtool(W))
 			if (src.locked)
 				boutput(user, SPAN_ALERT("You need to unlock the cyborg first."))
@@ -1500,7 +1513,6 @@
 			..()
 
 	attack_hand(mob/user)
-
 		var/list/available_actions = list()
 		if (src.part_head)
 			if (src.brainexposed && src.part_head.brain)
@@ -1512,10 +1524,12 @@
 				available_actions.Add("Remove an Upgrade")
 			if (src.module && src.module != "empty")
 				available_actions.Add("Remove the Module")
-			if (cell)
+			if (src.cell)
 				available_actions.Add("Remove the Power Cell")
+			if (src.part_chest.disk)
+				available_actions.Add("Remove the Disk")
 
-		if (available_actions.len)
+		if (length(available_actions))
 			available_actions.Insert(1, "Cancel")
 			var/action = tgui_input_list(user, "What do you want to do?", "Cyborg Maintenance", available_actions)
 			if (!action || action == "Cancel")
@@ -1596,7 +1610,16 @@
 					src.part_chest.cell = null
 					src.cell = null
 
-			update_appearance()
+				if ("Remove the Disk")
+					if (!src?.part_chest?.disk)
+						return
+					var/obj/item/disk/data/disk = src.part_chest.disk
+					user.put_in_hand_or_drop(disk)
+					user.show_text("You remove [disk] from [src].", "red")
+					src.show_text("Your [disk] was removed!", "red")
+					src.part_chest.disk = null
+
+			src.update_appearance()
 		else //We're just bapping the borg
 			user.lastattacked = src
 			if(!user.stat)

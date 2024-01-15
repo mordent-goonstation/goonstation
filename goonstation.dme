@@ -588,6 +588,7 @@ var/datum/preMapLoad/preMapLoad = new
 #include "code\mob\living\silicon\ghostdrone.dm"
 #include "code\mob\living\silicon\hivebot.dm"
 #include "code\mob\living\silicon\robot.dm"
+#include "code\mob\living\silicon\robot_analysis.dm"
 #include "code\mob\living\silicon\robot_locks.dm"
 #include "code\mob\living\silicon\robot_statusupdate.dm"
 #include "code\mob\living\silicon\ai\ai_abilities.dm"

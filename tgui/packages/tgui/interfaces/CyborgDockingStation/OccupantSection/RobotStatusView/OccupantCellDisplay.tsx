@@ -6,10 +6,10 @@
  * @license ISC
  */
 
-import { Box, LabeledList } from '../../../components';
-import { CellChargeBar } from '../CellChargeBar';
-import { DockingAllowedButton } from '../DockingAllowedButton';
-import type { PowerCellData } from '../type';
+import { Box, LabeledList } from '../../../../components';
+import { CellChargeBar } from '../../CellChargeBar';
+import { DockingAllowedButton } from '../../DockingAllowedButton';
+import type { PowerCellData } from '../../type';
 
 interface OccupantCellDisplayProps {
   cell: PowerCellData | undefined;
@@ -29,7 +29,8 @@ export const OccupantCellDisplay = (props: OccupantCellDisplayProps) => {
           tooltip="Remove the occupant's power cell"
           disabled={!cell}
         />
-      }>
+      }
+      verticalAlign="middle">
       {cell ? <CellChargeBar cell={cell} /> : <Box bold>No Power Cell Installed</Box>}
     </LabeledList.Item>
   );

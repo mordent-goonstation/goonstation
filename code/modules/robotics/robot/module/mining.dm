@@ -4,7 +4,7 @@
 	icon_state = "mining"
 	mod_hudicon = "mining"
 	included_cosmetic = /datum/robot_cosmetic/mining
-	included_tools = /datum/robot/module_tool_creator/recursive/module/mining
+	initial_tools = /datum/robot/module_tool_creator/recursive/module/mining
 	radio_type = /obj/item/device/radio/headset/miner
 	mailgroups = list(MGD_MINING, MGD_CARGO, MGO_SILICON, MGD_PARTY)
 	alertgroups = list(MGA_MAIL, MGA_RADIO, MGA_SALES, MGA_SHIPPING, MGA_CARGOREQUEST, MGA_DEATH)

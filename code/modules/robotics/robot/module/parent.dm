@@ -10,11 +10,11 @@ ADMIN_INTERACT_PROCS(/obj/item/robot_module, proc/admin_add_tool, proc/admin_rem
 	item_state = "electronic"
 	w_class = W_CLASS_SMALL
 	flags = FPRINT | TABLEPASS | CONDUCT
-	var/list/tools = list()
+	var/list/obj/item/tools = null
 	var/mod_hudicon = "unknown"
 	var/cosmetic_mods = null
-	var/included_tools = /datum/robot/module_tool_creator/recursive/module/common
 	var/included_cosmetic = null
+	var/initial_tools = /datum/robot/module_tool_creator/recursive/module/common
 	var/radio_type = null
 	var/obj/item/device/radio/headset/radio = null
 	var/list/mailgroups = list(MGO_SILICON, MGD_PARTY)
@@ -22,9 +22,8 @@ ADMIN_INTERACT_PROCS(/obj/item/robot_module, proc/admin_add_tool, proc/admin_rem
 
 /obj/item/robot_module/New()
 	..()
-	src.add_contents(src.included_tools)
-	// no need to keep the definition past initializing
-	src.included_tools = null
+	src.tools = list()
+	src.append_tools(src.initial_tools)
 
 	if (ispath(src.included_cosmetic, /datum/robot_cosmetic))
 		src.cosmetic_mods = new included_cosmetic(src)
@@ -33,37 +32,37 @@ ADMIN_INTERACT_PROCS(/obj/item/robot_module, proc/admin_add_tool, proc/admin_rem
 		src.radio = new src.radio_type(src)
 
 // handle various ways of adding tools to the module
-/obj/item/robot_module/proc/add_contents(adding_contents)
-	if (isnull(adding_contents))
+/obj/item/robot_module/proc/append_tools(appending_tools)
+	if (isnull(appending_tools))
 		return
-	if (istype(adding_contents, /obj/item))
+	if (istype(appending_tools, /obj/item))
 		// handle adding single instance of tool
-		var/obj/item/I = adding_contents
+		var/obj/item/I = appending_tools
 		I.cant_drop = TRUE
 		I.set_loc(src)
 		src.tools += I
 		return I
-	if (ispath(adding_contents, /obj/item))
+	if (ispath(appending_tools, /obj/item))
 		// handle adding tool by path (instantiate)
-		var/obj/item/I = new adding_contents(src)
+		var/obj/item/I = new appending_tools(src)
 		// recurse here to avoid duplication; could optimize this call out
-		return src.add_contents(I)
-	if (istype(adding_contents, /datum/robot/module_tool_creator))
+		return src.append_tools(I)
+	if (istype(appending_tools, /datum/robot/module_tool_creator))
 		// handle adding by definition
-		var/datum/robot/module_tool_creator/MTC = adding_contents
+		var/datum/robot/module_tool_creator/MTC = appending_tools
 		var/I = MTC.apply_to_module(src)
 		return I
-	if (ispath(adding_contents, /datum/robot/module_tool_creator))
+	if (ispath(appending_tools, /datum/robot/module_tool_creator))
 		// handle adding by definition path (instantiate)
-		var/datum/robot/module_tool_creator/MTC = new adding_contents
+		var/datum/robot/module_tool_creator/MTC = new appending_tools
 		// recurse here to avoid duplication; could optimize this call out
-		return src.add_contents(MTC)
-	if (islist(adding_contents))
+		return src.append_tools(MTC)
+	if (islist(appending_tools))
 		// handle adding a batch at once
-		var/list/L = adding_contents
+		var/list/L = appending_tools
 		var/list/added = list()
 		for (var/member in L)
-			var/resolved_member = src.add_contents(member)
+			var/resolved_member = src.append_tools(member)
 			if (!isnull(resolved_member))
 				// N.B. this will flatten lists, which is desired behavior here
 				added += resolved_member
@@ -76,7 +75,7 @@ ADMIN_INTERACT_PROCS(/obj/item/robot_module, proc/admin_add_tool, proc/admin_rem
 	if (!type)
 		return
 	var/obj/item/I = new type(src)
-	src.add_contents(I)
+	src.append_tools(I)
 	boutput(usr, "Added [I] to [src].")
 
 /// Admin interact menu for removing tools from the module

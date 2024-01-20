@@ -33,7 +33,7 @@
  * * return {(/obj/item|/list</obj/item>)} result - Added contents
  */
 /datum/robot/module_tool_creator/proc/apply_to_module(obj/item/robot_module/M)
-	return M.add_contents(src.instantiate(M))
+	return M.append_tools(src.instantiate(M))
 
 /**
  * Stub, used to instantiate tool(s).

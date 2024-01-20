@@ -4,7 +4,7 @@
 	icon_state = "science"
 	mod_hudicon = "science"
 	included_cosmetic = /datum/robot_cosmetic/science
-	included_tools = /datum/robot/module_tool_creator/recursive/module/science
+	initial_tools = /datum/robot/module_tool_creator/recursive/module/science
 	radio_type = /obj/item/device/radio/headset/research
 	mailgroups = list(MGD_SCIENCE, MGO_SILICON, MGD_PARTY)
 

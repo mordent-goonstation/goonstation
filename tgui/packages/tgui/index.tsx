@@ -26,6 +26,7 @@ import { setGlobalStore } from './backend';
 import { setupGlobalEvents } from './events';
 import { setupHotKeys } from './hotkeys';
 import { loadIconRefMap } from './icons';
+import { PageErrorBoundary } from './interfaces/PageErrorBoundary';
 import { captureExternalLinks } from './links';
 import { createRenderer } from './renderer';
 import { configureStore } from './store';
@@ -41,7 +42,12 @@ const renderApp = createRenderer(() => {
 
   const { getRoutedComponent } = require('./routes');
   const Component = getRoutedComponent(store);
-  return <Component />;
+  // |GOONSTATION-ADD| Wrap in PageErrorBoundary
+  return (
+    <PageErrorBoundary>
+      <Component />
+    </PageErrorBoundary>
+  );
 });
 
 function setupApp() {

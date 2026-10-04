@@ -5,7 +5,7 @@
  * @license ISC
  */
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useBackend, useSharedState } from 'tgui/backend';
 import {
   Box,
@@ -13,17 +13,13 @@ import {
   Image,
   Input,
   LabeledControls,
-  Modal,
   NumberInput,
   Section,
   Stack,
 } from 'tgui-core/components';
 
-import { type ChemMasterData } from './type';
-
-const ICON_LIST_PILLS = 0;
-const ICON_LIST_BOTTLES = 1;
-const ICON_LIST_PATCHES = 2;
+import { ModalContext } from './ModalContext';
+import { type ChemMasterData, ModalType } from './type';
 
 export const OperationsSection = () => {
   const { data } = useBackend<ChemMasterData>();
@@ -71,78 +67,11 @@ export const OperationsSection = () => {
   );
 };
 
-const SelectIconModal = (props) => {
-  const { data } = useBackend<ChemMasterData>();
-
-  const pill_icons = data.pill_icons ?? [];
-  const bottle_icons = data.bottle_icons ?? [];
-  const patch_icons = data.patch_icons ?? [];
-
-  const { icon_list, set_icon, cancel_modal } = props;
-
-  const cancel_button = (
-    <Button
-      tooltip="Cancel"
-      icon="times"
-      color="red"
-      mr={1}
-      onClick={() => cancel_modal()}
-    />
-  );
-
-  const button_image = (item, index) => (
-    <Button
-      key={index}
-      onClick={() => {
-        set_icon(index);
-      }}
-    >
-      <Image
-        height="32px"
-        width="32px"
-        src={`data:image/png;base64,${icon_list !== ICON_LIST_PILLS ? item[1] : item}`}
-        style={{
-          verticalAlign: 'middle',
-        }}
-      />
-      {icon_list !== ICON_LIST_PILLS && (
-        <Box textAlign="center" bold>
-          {item[0]}u
-        </Box>
-      )}
-    </Button>
-  );
-
-  return (
-    <Modal mx="auto" backgroundColor="#1c2734">
-      {icon_list === ICON_LIST_PILLS && (
-        <Section title="Select Pill" buttons={cancel_button} minWidth={10}>
-          {pill_icons.map(button_image)}
-        </Section>
-      )}
-      {icon_list === ICON_LIST_BOTTLES && (
-        <Section title="Select Bottle" buttons={cancel_button} minWidth={12}>
-          {bottle_icons.map(button_image)}
-        </Section>
-      )}
-      {icon_list === ICON_LIST_PATCHES && (
-        <Section title="Select Patch" buttons={cancel_button} minWidth={12}>
-          {patch_icons.map(button_image)}
-        </Section>
-      )}
-    </Modal>
-  );
-};
-
 const IconButtonControl = (props) => {
-  const { modal_function, imageb64 } = props;
+  const { onClick, imageb64 } = props;
   return (
     <LabeledControls.Item label="">
-      <Button
-        tooltip="Change type"
-        tooltipPosition="top"
-        onClick={() => modal_function(true)}
-      >
+      <Button tooltip="Change type" tooltipPosition="top" onClick={onClick}>
         <Image
           height="32px"
           width="32px"
@@ -161,7 +90,7 @@ const AmountInputControl = (props) => {
   return (
     <LabeledControls.Item label="">
       <NumberInput
-        width={'5'}
+        width={5}
         format={(value) => value + 'u'}
         value={current_amount}
         minValue={5}
@@ -205,29 +134,17 @@ const MakePill = (props) => {
   );
 
   const { pill_icons } = data;
-  const [modal_singlepill, set_modal_singlepill] = useState(false);
+  const { openModal } = useContext(ModalContext);
   const [icon_singlepill, set_icon_singlepill] = useSharedState(
     'icon_singlepill',
     0,
   );
-  const close_modal = () => set_modal_singlepill(false); // cancel/close modal
-  const set_icon = (index) => {
-    set_icon_singlepill(index);
-    close_modal();
-  };
 
   return (
-    <Box>
-      {modal_singlepill && (
-        <SelectIconModal
-          icon_list={ICON_LIST_PILLS}
-          set_icon={set_icon}
-          cancel_modal={close_modal}
-        />
-      )}
-      <LabeledControls width={0}>
+    <>
+      <LabeledControls>
         <IconButtonControl
-          modal_function={set_modal_singlepill}
+          onClick={() => openModal(ModalType.SinglePill, set_icon_singlepill)}
           imageb64={pill_icons ? pill_icons[icon_singlepill] : undefined}
         />
         <MakeButtonControl
@@ -246,7 +163,7 @@ const MakePill = (props) => {
           max_amount={max_volume}
         />
       </LabeledControls>
-    </Box>
+    </>
   );
 };
 
@@ -261,29 +178,19 @@ const MakePills = (props) => {
   );
 
   const { pill_icons } = data;
-  const [modal_multiplepills, set_modal_multiplepills] = useState(false);
+  const { openModal } = useContext(ModalContext);
   const [icon_multiplepills, set_icon_multiplepills] = useSharedState(
     'icon_multiplepills',
     0,
   );
-  const close_modal = () => set_modal_multiplepills(false); // cancel/close modal
-  const set_icon = (index) => {
-    set_icon_multiplepills(index);
-    close_modal();
-  };
 
   return (
     <Box>
-      {modal_multiplepills && (
-        <SelectIconModal
-          icon_list={ICON_LIST_PILLS}
-          set_icon={set_icon}
-          cancel_modal={close_modal}
-        />
-      )}
-      <LabeledControls width={0}>
+      <LabeledControls>
         <IconButtonControl
-          modal_function={set_modal_multiplepills}
+          onClick={() =>
+            openModal(ModalType.MultiplePills, set_icon_multiplepills)
+          }
           imageb64={pill_icons ? pill_icons[icon_multiplepills] : undefined}
         />
         <MakeButtonControl
@@ -322,27 +229,18 @@ function MakeBottle(props) {
 
   const { item_name } = props;
   const { bottle_icons } = data;
-  const [modal_bottle, set_modal_bottle] = useState(false);
+  const { openModal } = useContext(ModalContext);
   const [icon_bottle, set_icon_bottle] = useSharedState('icon_bottle', 2);
-  const close_modal = () => set_modal_bottle(false); // cancel/close modal
   const set_icon = (index) => {
     set_icon_bottle(index);
     set_bottle_amount(bottle_icons[index][0]); // set maximum value
-    close_modal();
   };
 
   return (
     <Box>
-      {modal_bottle && (
-        <SelectIconModal
-          icon_list={ICON_LIST_BOTTLES}
-          set_icon={set_icon}
-          cancel_modal={close_modal}
-        />
-      )}
-      <LabeledControls width={0}>
+      <LabeledControls>
         <IconButtonControl
-          modal_function={set_modal_bottle}
+          onClick={() => openModal(ModalType.Bottle, set_icon)}
           imageb64={bottle_icons ? bottle_icons[icon_bottle][1] : undefined}
         />
         <MakeButtonControl
@@ -375,30 +273,21 @@ function MakePatch(props) {
 
   const { item_name } = props;
   const { patch_icons } = data;
-  const [modal_singlepatch, set_modal_singlepatch] = useState(false);
+  const { openModal } = useContext(ModalContext);
   const [icon_singlepatch, set_icon_singlepatch] = useSharedState(
     'icon_singlepatch',
     1,
   );
-  const close_modal = () => set_modal_singlepatch(false); // cancel/close modal
   const set_icon = (index) => {
     set_icon_singlepatch(index);
     set_single_patch_amount(patch_icons[index][0]); // set maximum value
-    close_modal();
   };
 
   return (
     <Box>
-      {modal_singlepatch && (
-        <SelectIconModal
-          icon_list={ICON_LIST_PATCHES}
-          set_icon={set_icon}
-          cancel_modal={close_modal}
-        />
-      )}
-      <LabeledControls width={0}>
+      <LabeledControls>
         <IconButtonControl
-          modal_function={set_modal_singlepatch}
+          onClick={() => openModal(ModalType.SinglePatch, set_icon)}
           imageb64={patch_icons ? patch_icons[icon_singlepatch][1] : undefined}
         />
         <MakeButtonControl
@@ -431,30 +320,21 @@ function MakePatches(props) {
 
   const { item_name } = props;
   const { patch_icons } = data;
-  const [modal_multiplepatches, set_modal_multiplepatches] = useState(false);
+  const { openModal } = useContext(ModalContext);
   const [icon_multiplepatches, set_icon_multiplepatches] = useSharedState(
     'icon_multiplepatches',
     1,
   );
-  const close_modal = () => set_modal_multiplepatches(false); // cancel/close modal
   const set_icon = (index) => {
     set_icon_multiplepatches(index);
     set_patches_amount(patch_icons[index][0]); // set maximum value
-    close_modal();
   };
 
   return (
     <Box>
-      {modal_multiplepatches && (
-        <SelectIconModal
-          icon_list={ICON_LIST_PATCHES}
-          set_icon={set_icon}
-          cancel_modal={close_modal}
-        />
-      )}
-      <LabeledControls width={0}>
+      <LabeledControls>
         <IconButtonControl
-          modal_function={set_modal_multiplepatches}
+          onClick={() => openModal(ModalType.MultiplePatches, set_icon)}
           imageb64={
             patch_icons ? patch_icons[icon_multiplepatches][1] : undefined
           }

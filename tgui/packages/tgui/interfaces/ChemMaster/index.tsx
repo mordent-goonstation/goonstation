@@ -18,11 +18,11 @@ import {
 } from 'tgui-core/components';
 import { LabeledControls } from 'tgui-core/components';
 
-import { useBackend, useSharedState } from '../backend';
-import { Modal } from '../components';
-import { Window } from '../layouts';
-import { NoContainer, ReagentGraph, ReagentList } from './common/ReagentInfo';
-import { capitalize } from './common/stringUtils';
+import { useBackend, useSharedState } from '../../backend';
+import { Modal } from '../../components';
+import { Window } from '../../layouts';
+import { NoContainer, ReagentGraph, ReagentList } from '../common/ReagentInfo';
+import { capitalize } from '../common/stringUtils';
 
 const ICON_LIST_PILLS = 0;
 const ICON_LIST_BOTTLES = 1;

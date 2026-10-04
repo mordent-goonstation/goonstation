@@ -5,28 +5,22 @@
  * @license ISC
  */
 
-import type {
-  ModuleActionPayload,
-  MoveToolActionPayload,
-  ResetModuleActionPayload,
-  ToolActionPayload,
-} from './type/action';
+import type { MoveToolActionPayload, ToolActionPayload } from './type/action';
 import { Action } from './type/action';
 
 type Act = (action: string, payload?: object) => void;
-const createAction =
+
+const createSimpleAction = (action: Action) => (act: Act) =>
+  act(action, undefined);
+
+const createPayloadAction =
   <T extends object>(action: Action) =>
   (act: Act, payload: T) =>
     act(action, payload);
 
-export const ejectModule = createAction<ModuleActionPayload>(
-  Action.EjectModule,
-);
-export const moveTool = createAction<MoveToolActionPayload>(Action.MoveTool);
-export const removeTool = createAction<ToolActionPayload>(Action.RemoveTool);
-export const resetModule = createAction<ResetModuleActionPayload>(
-  Action.ResetModule,
-);
-export const selectModule = createAction<ModuleActionPayload>(
-  Action.SelectModule,
-);
+const ejectModule = createSimpleAction(Action.EjectModule);
+const changeInsertedModule = createSimpleAction(Action.ChangeInsertedModule);
+const moveTool = createPayloadAction<MoveToolActionPayload>(Action.MoveTool);
+const removeTool = createPayloadAction<ToolActionPayload>(Action.RemoveTool);
+
+export { changeInsertedModule, ejectModule, moveTool, removeTool };

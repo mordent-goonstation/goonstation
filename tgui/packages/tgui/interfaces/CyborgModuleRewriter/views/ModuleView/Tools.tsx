@@ -41,7 +41,7 @@ export const Tools = (props: ToolsProps) => {
   return (
     <Tabs vertical>
       {tools.map((tool) => {
-        const { name, item_ref: itemRef } = tool;
+        const { name, itemRef } = tool;
         return (
           <Tool
             key={itemRef}

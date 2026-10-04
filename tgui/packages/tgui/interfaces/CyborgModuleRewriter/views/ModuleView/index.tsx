@@ -6,23 +6,21 @@
  */
 
 import { useCallback } from 'react';
-import { Button, Section, Stack, Tabs } from 'tgui-core/components';
+import { Section, Stack } from 'tgui-core/components';
 
 import { useBackend } from '../../../../backend';
 import * as actions from '../../action';
-import { EmptyPlaceholder } from '../../EmptyPlaceholder';
+import { ModuleDrive } from '../../components/ModuleDrive';
 import { Direction } from '../../type/action';
 import type { CyborgModuleRewriterData } from '../../type/data';
 import { ModuleDetail } from './ModuleDetail';
 
-// width hard-coded to allow display of widest current module name without resizing when ejected/reset
-const SIDEBAR_WIDTH = 20;
-
 export const ModuleView = () => {
   const { act, data } = useBackend<CyborgModuleRewriterData>();
-  const { modules: { available = [], selected } = {} } = data;
-  const handleEjectModule = useCallback(
-    (itemRef: string) => actions.ejectModule(act, { itemRef }),
+  const { insertedModule } = data;
+  const handleEjectModule = useCallback(() => actions.ejectModule(act), [act]);
+  const handleChangeModule = useCallback(
+    () => actions.changeInsertedModule(act),
     [act],
   );
   const handleMoveToolDown = useCallback(
@@ -45,67 +43,37 @@ export const ModuleView = () => {
     (itemRef: string) => actions.removeTool(act, { itemRef }),
     [act],
   );
-  const handleResetModule = useCallback(
-    (moduleId: string) => actions.resetModule(act, { moduleId }),
-    [act],
-  );
-  const handleSelectModule = useCallback(
-    (itemRef: string) => actions.selectModule(act, { itemRef }),
-    [act],
-  );
-  const { item_ref: selectedModuleRef, tools = [] } = selected || {};
-
-  if (available.length === 0) {
-    return (
-      <Section fill>
-        <EmptyPlaceholder>No modules inserted</EmptyPlaceholder>
-      </Section>
-    );
-  }
+  const {
+    itemRef: insertedModuleRef,
+    name: moduleName,
+    tools = [],
+  } = insertedModule || {};
+  const diskColor = 'blue';
   return (
-    <Stack fill>
-      <Stack.Item width={SIDEBAR_WIDTH}>
-        <Section title="Modules" scrollable fill>
-          <Tabs vertical>
-            {available.map((module) => {
-              const { item_ref: itemRef, name } = module;
-              const ejectButton = (
-                <Button
-                  icon="eject"
-                  color="transparent"
-                  onClick={() => handleEjectModule(itemRef)}
-                  tooltip={`Eject ${name}`}
-                />
-              );
-              return (
-                <Tabs.Tab
-                  key={itemRef}
-                  onClick={() => handleSelectModule(itemRef)}
-                  rightSlot={ejectButton}
-                  selected={itemRef === selectedModuleRef}
-                >
-                  {name}
-                </Tabs.Tab>
-              );
-            })}
-          </Tabs>
-        </Section>
-      </Stack.Item>
-      <Stack.Item grow>
-        {selectedModuleRef ? (
+    <Section fill title="Module">
+      <Stack vertical fill>
+        <Stack.Item align="center">
+          <ModuleDrive
+            onEject={handleEjectModule}
+            onInsert={handleChangeModule}
+            onContentClick={handleChangeModule}
+          >
+            {!!insertedModule && (
+              <ModuleDrive.Module color={diskColor}>
+                {moduleName}
+              </ModuleDrive.Module>
+            )}
+          </ModuleDrive>
+        </Stack.Item>
+        {insertedModuleRef && (
           <ModuleDetail
             onMoveToolDown={handleMoveToolDown}
             onMoveToolUp={handleMoveToolUp}
             onRemoveTool={handleRemoveTool}
-            onResetModule={handleResetModule}
             tools={tools}
           />
-        ) : (
-          <Section fill>
-            <EmptyPlaceholder>No module selected</EmptyPlaceholder>
-          </Section>
         )}
-      </Stack.Item>
-    </Stack>
+      </Stack>
+    </Section>
   );
 };

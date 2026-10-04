@@ -6,11 +6,10 @@
  */
 
 export enum Action {
-  EjectModule = 'module-eject',
+  EjectModule = 'ejectModule',
+  ChangeInsertedModule = 'changeInsertedModule',
   MoveTool = 'tool-move',
   RemoveTool = 'tool-remove',
-  ResetModule = 'module-reset',
-  SelectModule = 'module-select',
 }
 
 export enum Direction {
@@ -22,14 +21,8 @@ interface ItemActionPayload {
   itemRef: string;
 }
 
-export interface ModuleActionPayload extends ItemActionPayload {}
-
 export interface ToolActionPayload extends ItemActionPayload {}
 
 export interface MoveToolActionPayload extends ToolActionPayload {
   dir: Direction;
-}
-
-export interface ResetModuleActionPayload {
-  moduleId: string;
 }

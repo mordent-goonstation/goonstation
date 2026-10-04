@@ -6,25 +6,16 @@
  */
 
 export interface CyborgModuleRewriterData {
-  modules: ModulesData;
+  insertedModule: ModuleData;
 }
 
-interface AvailableModuleData {
+export interface ModuleData {
+  itemRef: string;
   name: string;
-  item_ref: string;
-}
-
-interface SelectedModuleData {
-  item_ref: string;
-  tools: Array<ToolData>;
-}
-
-export interface ModulesData {
-  available: Array<AvailableModuleData>;
-  selected: SelectedModuleData;
+  tools: ToolData[];
 }
 
 export interface ToolData {
+  itemRef: string;
   name: string;
-  item_ref: string;
 }

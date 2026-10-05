@@ -10,21 +10,17 @@ import { useModalContext } from './ModalContext';
 import { OperationsSection } from './OperationsSection';
 import { ReagentDisplay } from './ReagentDisplay';
 import { SelectIconModal } from './SelectIconModal';
-import { ModalType } from './type';
 
 export const ChemMaster = () => {
-  const [modalContextValue, modalContextState, ModalContext] =
-    useModalContext();
+  const [modalContextValue, modalOptions, ModalContext] = useModalContext();
   return (
-    <Window width={435} height={480} theme="ntos">
+    <Window width={435} height={510} theme="ntos">
       <ModalContext value={modalContextValue}>
         <Window.Content>
           <ReagentDisplay />
           <OperationsSection />
         </Window.Content>
-        {modalContextState.modalType !== ModalType.None && (
-          <SelectIconModal {...modalContextState} />
-        )}
+        {modalOptions && <SelectIconModal {...modalOptions} />}
       </ModalContext>
     </Window>
   );

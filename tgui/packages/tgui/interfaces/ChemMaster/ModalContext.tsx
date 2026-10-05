@@ -8,16 +8,7 @@
 import { createContext, useState } from 'react';
 
 import { useConstant } from '../common/hooks';
-import {
-  type ModalContextState,
-  type ModalContextValue,
-  ModalType,
-} from './type';
-
-const closedModalState: ModalContextState = {
-  modalType: ModalType.None,
-  onSelectIcon: () => undefined,
-};
+import type { IconModalOptions, ModalContextValue } from './type';
 
 const stubModalContextValue: ModalContextValue = {
   openModal: () => undefined,
@@ -27,12 +18,12 @@ const stubModalContextValue: ModalContextValue = {
 export const ModalContext = createContext(stubModalContextValue);
 
 export const useModalContext = () => {
-  const [modalContextState, setModalContextState] =
-    useState<ModalContextState>(closedModalState);
+  const [modalOptions, setModalOptions] = useState<IconModalOptions | null>(
+    null,
+  );
   const modalContextValue = useConstant<ModalContextValue>(() => ({
-    openModal: (modalType, onSelectIcon) =>
-      setModalContextState({ modalType, onSelectIcon }),
-    closeModal: () => setModalContextState(closedModalState),
+    openModal: (options) => setModalOptions(options),
+    closeModal: () => setModalOptions(null),
   }));
-  return [modalContextValue, modalContextState, ModalContext] as const;
+  return [modalContextValue, modalOptions, ModalContext] as const;
 };

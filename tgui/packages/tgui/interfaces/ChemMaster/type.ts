@@ -8,32 +8,39 @@
 import { type ReagentContainer } from '../common/ReagentInfo';
 
 export interface ChemMasterData {
-  bottle_icons: [number, string][];
+  ampoule_options: [number, string][];
+  bottle_options: [number, string][];
   container: ReagentContainer | null;
   default_name: string | null;
-  patch_icons: [number, string][];
-  pill_icons: [number, string][];
+  patch_options: [number, string][];
+  pill_options: string[];
   name_max_len: number;
 }
 
-export enum ModalType {
-  None = 'none',
-  SinglePill = 'singlepill',
-  MultiplePills = 'multiplepills',
-  Bottle = 'bottle',
-  SinglePatch = 'singlepatch',
-  MultiplePatches = 'multiplepatches',
+export interface ItemIcon {
+  src: string;
+  // Fixed volume of the container; undefined if limited only by the source container
+  capacity?: number;
+}
+
+export interface IconEntry {
+  src: string;
+  // Original index in the backend icon list, used for selection
+  index: number;
+}
+
+export interface IconGroup {
+  label?: string;
+  icons: IconEntry[];
+}
+
+export interface IconModalOptions {
+  title: string;
+  groups: IconGroup[];
+  onSelectIcon: (index: number) => void;
 }
 
 export interface ModalContextValue {
-  openModal: (
-    modalType: ModalType,
-    onSelectIcon: (index: number) => void,
-  ) => void;
+  openModal: (options: IconModalOptions) => void;
   closeModal: () => void;
-}
-
-export interface ModalContextState {
-  modalType: ModalType;
-  onSelectIcon: (index: number) => void;
 }

@@ -25,7 +25,6 @@ TYPEINFO(/obj/machinery/chem_master)
 	var/list/whitelist = list()
 
 	var/list/regular_bottles = list(
-		/obj/item/reagent_containers/ampoule, // 5u ampoule
 		/obj/item/reagent_containers/glass/bottle/plastic, // 30u plastic bottle
 		/obj/item/reagent_containers/glass/bottle/chemical/plastic // 50u plastic bottle
 	)
@@ -190,13 +189,13 @@ TYPEINFO(/obj/machinery/chem_master)
 	ui_static_data(mob/user)
 		. = list()
 
-		var/list/pill_icons = list()
+		var/list/pill_options = list()
 		for(var/i = 0, i <= CHEMMASTER_MAX_PILL, ++i)
 			var/icon/pill_icon = icon('icons/obj/items/pills.dmi', "pill[i]")
-			pill_icons.Add(list(icon2base64(pill_icon)))
-		.["pill_icons"] = pill_icons
+			pill_options.Add(list(icon2base64(pill_icon)))
+		.["pill_options"] = pill_options
 
-		var/list/bottle_icons = list()
+		var/list/bottle_options = list()
 		var/obj/item/reagent_containers/bottle = null
 		var/icon/bottle_icon = null
 		var/bottle_capacity = null
@@ -204,33 +203,37 @@ TYPEINFO(/obj/machinery/chem_master)
 			bottle = new bottle_path(src)
 			bottle_icon = icon(bottle.icon, bottle.icon_state)
 			bottle_capacity = bottle.initial_volume
-			bottle_icons.Add(list(list(bottle_capacity, icon2base64(bottle_icon))))
+			bottle_options.Add(list(list(bottle_capacity, icon2base64(bottle_icon))))
 			qdel(bottle)
 		// small cola can
 		bottle = new /obj/item/reagent_containers/food/drinks/cola/custom/small(src)
 		bottle_capacity = bottle.initial_volume
 		for(var/i = 1, i <= CHEMMASTER_MAX_CANS, ++i)
 			bottle_icon = icon(bottle.icon, "cola-[i]-small")
-			bottle_icons.Add(list(list(bottle_capacity, icon2base64(bottle_icon))))
+			bottle_options.Add(list(list(bottle_capacity, icon2base64(bottle_icon))))
 		qdel(bottle)
 		// big cola can
 		bottle = new /obj/item/reagent_containers/food/drinks/cola/custom(src)
 		bottle_capacity = bottle.initial_volume
 		for(var/i = 1, i <= CHEMMASTER_MAX_CANS, ++i)
 			bottle_icon = icon(bottle.icon, "cola-[i]")
-			bottle_icons.Add(list(list(bottle_capacity, icon2base64(bottle_icon))))
+			bottle_options.Add(list(list(bottle_capacity, icon2base64(bottle_icon))))
 		qdel(bottle)
-		.["bottle_icons"] = bottle_icons
+		.["bottle_options"] = bottle_options
 		.["name_max_len"] = CHEMMASTER_ITEMNAME_MAXSIZE
-		var/list/patch_icons = list()
+		var/list/patch_options = list()
 
 		for(var/patch_path in patches_list)
 			var/obj/item/reagent_containers/patch = new patch_path(src)
 			var/icon/patch_icon = icon(patch.icon, patch.icon_state)
 			var/patch_capacity = patch.initial_volume
-			patch_icons.Add(list(list(patch_capacity, icon2base64(patch_icon))))
+			patch_options.Add(list(list(patch_capacity, icon2base64(patch_icon))))
 			qdel(patch)
-		.["patch_icons"] = patch_icons
+		.["patch_options"] = patch_options
+
+		var/obj/item/reagent_containers/ampoule/ampoule = new(src)
+		.["ampoule_options"] = list(list(ampoule.initial_volume, icon2base64(icon(ampoule.icon, ampoule.icon_state))))
+		qdel(ampoule)
 
 	proc/rebuild_beaker_cache()
 		if(QDELETED(src.beaker))
@@ -506,6 +509,34 @@ TYPEINFO(/obj/machinery/chem_master)
 
 				TRANSFER_OR_DROP(src, bottle)
 				ui.user.put_in_hand_or_eject(bottle)
+
+				if(!src.beaker.reagents.total_volume) // qol eject when empty
+					eject_beaker(ui.user)
+
+				rebuild_beaker_cache()
+				. = TRUE
+			if("makeampoule")
+				if(!src.beaker || !src.beaker.reagents.total_volume)
+					return
+
+				var/item_name = manufacture_name(params["item_name"])
+				if(!item_name) // how did we get here?
+					boutput(ui.user, "[src] ampoule labeller makes a weird buzz. That can't be good.")
+					return
+
+				var/obj/item/reagent_containers/ampoule/ampoule = new(src)
+				// sanity check
+				var/reagent_amount = clamp(round(params["amount"]), CHEMMASTER_MINIMUM_REAGENT, ampoule.initial_volume)
+
+				global.phrase_log.log_phrase("bottle", item_name, no_duplicates=TRUE)
+
+				ampoule.name = "[item_name] [ampoule.name]"
+				src.beaker.reagents.trans_to(ampoule, reagent_amount)
+
+				logTheThing(LOG_COMBAT, usr, "used the [src] to create [ampoule] containing [log_reagents(ampoule)] at [log_loc(src)].")
+
+				TRANSFER_OR_DROP(src, ampoule)
+				ui.user.put_in_hand_or_eject(ampoule)
 
 				if(!src.beaker.reagents.total_volume) // qol eject when empty
 					eject_beaker(ui.user)
